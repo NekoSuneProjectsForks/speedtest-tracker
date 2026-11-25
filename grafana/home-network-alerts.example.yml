@@ -1,0 +1,17 @@
+groups:
+  - name: home-network
+    rules:
+      - alert: HomeNetworkProbeDown
+        expr: home_network_up == 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Network probe {{ $labels.probe }} unavailable"
+      - alert: HomeNetworkMonitorUnavailable
+        expr: up{job="home-network"} == 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Home network monitor cannot be scraped"
