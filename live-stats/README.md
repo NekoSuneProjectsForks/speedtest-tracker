@@ -24,3 +24,5 @@ From live-stats/, copy compose.example.yml to compose.yml, set TRACKER_URL to a 
     }
 
 Use your existing TLS certificate and connect to wss://YOUR_DOMAIN/ws/speedtest. If Nginx is containerized, use a shared Docker network and service DNS instead. Public REST endpoints can be called directly on the tracker domain; cross-origin browser clients may require an explicit CORS policy. Keep APP_DEBUG=false in production. Run node --test metrics.test.mjs to check the sidecar allowlist.
+
+The sidecar bounds upstream responses to 16 KiB and retains only the latest anonymous snapshot. After reconnecting, clients receive a new snapshot with its availability flag. Clients can fill gaps by walking the REST history cursor.

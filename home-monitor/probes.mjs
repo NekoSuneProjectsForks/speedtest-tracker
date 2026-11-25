@@ -65,8 +65,8 @@ export function record(previous, sample, now) {
 
 export function metrics(states, now) {
   const lines = [];
-  for (const [name, s] of states) {
-    const label = '{probe="'+name+'"}';
+  for (const [index, s] of states) {
+    const label = '{probe="probe_'+(index + 1)+'"}';
     const values = {
       up:Number(s.up), attempts_total:s.attempts, failures_total:s.failures,
       outages_total:s.outageCount, outage_seconds_total:s.outageSeconds,

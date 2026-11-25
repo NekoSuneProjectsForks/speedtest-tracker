@@ -21,13 +21,6 @@ class BuildPointData
         // Qualitative tags
         $point
 
-
-
-
-
-
-
-
             ->addTag('healthy', $this->evalHealthyTag($result->healthy))
             ->addTag('status', $result->status->value)
             ->addTag('scheduled', $result->scheduled ? 'true' : 'false');

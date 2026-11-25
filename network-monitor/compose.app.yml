@@ -4,7 +4,7 @@ services:
       context: ..
       dockerfile: network-monitor/Dockerfile.app
       args:
-        APP_BASE: "${NETWORK_MONITOR_APP_BASE:-lscr.io/linuxserver/speedtest-tracker:1.15.1}"
+        APP_BASE: "${NETWORK_MONITOR_APP_BASE:-ghcr.io/linuxserver/speedtest-tracker:1.15.1}"
     image: speedtest-tracker:home-network-monitor
     restart: unless-stopped
     environment:

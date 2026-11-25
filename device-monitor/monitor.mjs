@@ -1,18 +1,31 @@
 import http from 'node:http';
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { open } from 'node:fs/promises';
 const token = process.env.DEVICE_MONITOR_TOKEN;
 if (!token || token.length < 32) throw new Error('Set a strong DEVICE_MONITOR_TOKEN (32+ characters)');
 const source = process.env.COUNTERS_FILE || '/config/counters.json';
-const interval = Math.max(10000, Number(process.env.INTERVAL_MS) || 30000);
+const interval = Number(process.env.INTERVAL_MS ?? 30000);
+if (!Number.isInteger(interval) || interval < 10000 || interval > 300000) throw new Error('INTERVAL_MS must be between 10000 and 300000');
 let snapshot = {available:false, devices:[]}, previous = new Map(), lastSample = null;
 let busy = false;
 const alias = mac => 'device-'+createHmac('sha256',token).update(mac).digest('hex').slice(0,16);
+async function readSnapshot() {
+  const file = await open(source, 'r');
+  try {
+    const info = await file.stat();
+    if (!info.isFile() || info.size < 1 || info.size > 8 * 1024 * 1024) throw new Error('Invalid counters file size');
+    const {bytesRead, buffer} = await file.read(Buffer.alloc(info.size + 1));
+    if (bytesRead !== info.size) throw new Error('Counters changed during read');
+    return JSON.parse(buffer.toString('utf8', 0, bytesRead));
+  } finally {
+    await file.close();
+  }
+}
 async function poll() {
   if (busy) return;
   busy = true;
   try {
-    const raw = JSON.parse(await readFile(source,'utf8'));
+    const raw = await readSnapshot();
     const {columns,data} = raw;
     if (!Array.isArray(columns) || !Array.isArray(data) || data.length > 100000) throw new Error('Invalid counters');
     const indices = ['mac','rx_bytes','tx_bytes'].map(k=>columns.indexOf(k));
@@ -51,5 +64,8 @@ const server=http.createServer((req,res)=>{
   res.writeHead(snapshot.available?200:503,{'Content-Type':'application/json'});
   res.end(JSON.stringify(snapshot));
 });
+server.maxConnections = 32;
+server.requestTimeout = 5000;
+server.headersTimeout = 5000;
 server.listen(8091,'0.0.0.0');
 await poll();setInterval(poll,interval);

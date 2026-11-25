@@ -12,9 +12,10 @@ test('outage transitions and recovery',()=>{
 });
 test('only aliases and numeric measurements are exported',()=>{
   const t=validateTargets([{name:'router',type:'tcp',host:'192.168.1.1',port:443}])[0];
-  const output=metrics(new Map([[t.name,record(null,{up:false,seconds:null},100)]]),110);
-  assert.ok(output.includes('probe="router"'));
+  const output=metrics(new Map([[0,record(null,{up:false,seconds:null},100)]]),110);
+  assert.ok(output.includes('probe="probe_1"'));
   assert.ok(!output.includes(t.host));
+  assert.ok(!output.includes(t.name));
   assert.ok(!output.includes('latency_seconds'));
 });
 test('invalid aliases rejected',()=>assert.throws(()=>validateTargets([{name:'192.168.1.1',type:'tcp',host:'localhost',port:80}])));

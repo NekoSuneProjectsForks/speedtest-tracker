@@ -76,6 +76,7 @@ class PublicMetricsController extends Controller
                 $data['upload_mbps'][$operation] = $this->number($row->{$operation.'_up'}, 0.000008);
                 $data['ping_ms'][$operation] = $this->number($row->{$operation.'_ping'});
             }
+
             return $data;
         });
 

@@ -142,10 +142,6 @@ class PrometheusMetricsService
     {
         return [
 
-
-
-
-
             'scheduled' => $result->scheduled ? 'true' : 'false',
             'healthy' => $result->healthy ? 'true' : 'false',
             'status' => $result->status->value,

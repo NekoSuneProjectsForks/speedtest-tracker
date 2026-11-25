@@ -1,0 +1,56 @@
+x-logging: &rotated-logs
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  tracker:
+    image: "${TRACKER_IMAGE:?Set TRACKER_IMAGE to a verified GHCR tag or digest}"
+    restart: unless-stopped
+    env_file:
+      - "${TRACKER_RUNTIME_ENV:-./tracker.env}"
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      QUEUE_CONNECTION: database
+    ports:
+      - "127.0.0.1:${TRACKER_HTTP_PORT:-8080}:80"
+    volumes:
+      - type: bind
+        source: "${TRACKER_CONFIG_DIR:?Set TRACKER_CONFIG_DIR to an existing directory}"
+        target: /config
+        bind:
+          create_host_path: false
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "--max-time", "4", "http://127.0.0.1/api/healthcheck"]
+      interval: 30s
+      timeout: 5s
+      start_period: 90s
+      retries: 3
+    stop_grace_period: 60s
+    logging: *rotated-logs
+
+  collector:
+    image: "${COLLECTOR_IMAGE:-ghcr.io/nekosuneprojectsforks/speedtest-tracker-collector:fast-live-stats}"
+    profiles: [network-monitor]
+    network_mode: host
+    restart: unless-stopped
+    read_only: true
+    user: "${NETWORK_MONITOR_UID:-65532}:${NETWORK_MONITOR_GID:-65532}"
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 32
+    environment:
+      NETWORK_MONITOR_URL: "http://127.0.0.1:${TRACKER_HTTP_PORT:-8080}"
+      NETWORK_MONITOR_INTERFACE: "${NETWORK_MONITOR_INTERFACE:-eth0}"
+      NETWORK_MONITOR_SUBNET: "${NETWORK_MONITOR_SUBNET:-}"
+      NETWORK_MONITOR_TOKEN_FILE: /run/monitor/token
+    volumes:
+      - type: bind
+        source: "${COLLECTOR_TOKEN_PATH:-./secrets/collector-token}"
+        target: /run/monitor/token
+        read_only: true
+        bind:
+          create_host_path: false
+    logging: *rotated-logs

@@ -68,3 +68,5 @@ Enable Discord in the existing notification settings, enter a supported Discord 
 ## API and tests
 
 See the [private API reference](API.md). The Python collector tests run with `python3 -m unittest discover -s network-monitor`. Laravel tests use the same test database setup as the repository, with `php artisan test --filter=NetworkMonitor`.
+
+For production images, Raspberry Pi deployment, and upgrades from LinuxServer, see the [deployment guide](../deploy/README.md).

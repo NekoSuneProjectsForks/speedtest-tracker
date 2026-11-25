@@ -34,9 +34,6 @@ class GetLatestController extends Controller
                 'download' => ! blank($latest->download) ? Number::bitsToMagnitude(bits: $latest->download_bits, precision: 2, magnitude: 'mbit') : null,
                 'upload' => ! blank($latest->upload) ? Number::bitsToMagnitude(bits: $latest->upload_bits, precision: 2, magnitude: 'mbit') : null,
 
-
-
-
                 'scheduled' => $latest->scheduled,
                 'failed' => $latest->status === ResultStatus::Failed,
                 'created_at' => $latest->created_at->timezone(config('app.display_timezone'))->toISOString(true),

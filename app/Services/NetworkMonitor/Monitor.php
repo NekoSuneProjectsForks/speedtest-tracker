@@ -117,5 +117,16 @@ class Monitor
             DB::table($table)->where('observed_at', '<', $cutoff)->delete();
         }
         DB::table('network_outages')->where(fn ($query) => $query->where('ended_at', '<', $cutoff)->orWhere('interrupted_at', '<', $cutoff))->delete();
+        DB::transaction(function () use ($cutoff) {
+            DB::table('network_monitor_settings')->lockForUpdate()->find(1);
+
+            // Keep administrator-managed devices and remove abandoned discovery-only identities.
+            DB::table('network_devices')->whereNull('label')->where('monitor', true)
+                ->where('first_seen_at', '<', $cutoff)
+                ->where(fn (Builder $query) => $query->whereNull('last_seen_at')->orWhere('last_seen_at', '<', $cutoff))
+                ->whereNotExists(fn (Builder $query) => $query->from('network_sources')->whereColumn('device_id', 'network_devices.id'))
+                ->whereNotExists(fn (Builder $query) => $query->from('network_presence')->whereColumn('device_id', 'network_devices.id'))
+                ->delete();
+        }, 3);
     }
 }

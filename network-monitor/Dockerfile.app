@@ -1,5 +1,5 @@
 # Build from the repository root.
-ARG APP_BASE=lscr.io/linuxserver/speedtest-tracker:1.15.1
+ARG APP_BASE=ghcr.io/linuxserver/speedtest-tracker:1.15.1
 FROM ${APP_BASE} AS application
 WORKDIR /app/www
 COPY composer.json composer.lock ./
