@@ -111,6 +111,8 @@ class AppServiceProvider extends ServiceProvider
 
     protected function setApiRateLimit(): void
     {
+        RateLimiter::for('network-monitor', fn (Request $request) => Limit::perMinute(120)->by($request->ip()));
+
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(config('api.rate_limit'));
         });

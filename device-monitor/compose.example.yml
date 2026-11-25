@@ -1,0 +1,13 @@
+services:
+  device-monitor:
+    build: .
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    environment:
+      DEVICE_MONITOR_TOKEN: ${DEVICE_MONITOR_TOKEN:?set a strong secret}
+      INTERVAL_MS: "30000"
+    volumes:
+      - ./config:/config:ro
+    ports:
+      - "127.0.0.1:8091:8091"

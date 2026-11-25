@@ -82,3 +82,12 @@ jobs:
         run: php artisan test
         env:
           DB_CONNECTION: sqlite
+
+      - name: Test Network Monitor collector
+        run: python3 -m unittest discover -s network-monitor
+
+      - name: Test optional network sidecars
+        run: |
+          node --test home-monitor/probes.test.mjs
+          npm --prefix live-stats ci --ignore-scripts
+          npm --prefix live-stats test

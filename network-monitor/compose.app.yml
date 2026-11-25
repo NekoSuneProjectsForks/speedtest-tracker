@@ -1,0 +1,23 @@
+services:
+  tracker:
+    build:
+      context: ..
+      dockerfile: network-monitor/Dockerfile.app
+      args:
+        APP_BASE: "${NETWORK_MONITOR_APP_BASE:-ghcr.io/linuxserver/speedtest-tracker:1.15.1}"
+    image: speedtest-tracker:home-network-monitor
+    restart: unless-stopped
+    environment:
+      APP_KEY: "${APP_KEY:?Set APP_KEY for this deployment}"
+      APP_DEBUG: "false"
+      DB_CONNECTION: sqlite
+      PUID: "${PUID:-1000}"
+      PGID: "${PGID:-1000}"
+      TZ: "${TZ:-Etc/UTC}"
+    ports:
+      - "127.0.0.1:${NETWORK_MONITOR_APP_PORT:-8080}:80"
+    volumes:
+      - tracker-config:/config
+
+volumes:
+  tracker-config:

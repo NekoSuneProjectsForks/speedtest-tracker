@@ -15,20 +15,12 @@ class BuildPointData
 
     public function handle(Result $result): Point
     {
-        $point = Point::measurement('speedtest')
-            ->addTag('app_name', config('app.name'))
+        $point = Point::measurement('speedtest_anonymous')
             ->time($result->created_at->timestamp ?? time());
 
         // Qualitative tags
-        $point->addTag('result_id', $result->id)
-            ->addTag('external_ip', Arr::get($result->data, 'interface.externalIp'))
-            ->addTag('id', $result->id)
-            ->addTag('isp', Arr::get($result->data, 'isp'))
-            ->addTag('service', $result->service->value)
-            ->addTag('server_id', Arr::get($result->data, 'server.id'))
-            ->addTag('server_name', Arr::get($result->data, 'server.name'))
-            ->addTag('server_country', Arr::get($result->data, 'server.country'))
-            ->addTag('server_location', Arr::get($result->data, 'server.location'))
+        $point
+
             ->addTag('healthy', $this->evalHealthyTag($result->healthy))
             ->addTag('status', $result->status->value)
             ->addTag('scheduled', $result->scheduled ? 'true' : 'false');
@@ -53,7 +45,7 @@ class BuildPointData
             ->addField('downloaded_bytes', Number::castToType($result->download_bytes, 'float'))
             ->addField('uploaded_bytes', Number::castToType($result->upload_bytes, 'float'))
             ->addField('packet_loss', Number::castToType(Arr::get($result->data, 'packetLoss'), 'float'))
-            ->addField('log_message', Arr::get($result->data, 'message'));
+            ->addField('result_id', (int) $result->id);
 
         return $point;
     }

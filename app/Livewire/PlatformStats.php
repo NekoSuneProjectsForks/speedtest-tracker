@@ -13,9 +13,12 @@ class PlatformStats extends Component
     #[Computed]
     public function platformStats(): array
     {
-        $totalResults = Result::count();
-        $completedResults = Result::where('status', ResultStatus::Completed)->count();
-        $failedResults = Result::where('status', ResultStatus::Failed)->count();
+        $counts = \Illuminate\Support\Facades\Cache::remember('dashboard.result-counts.v1', 30, fn () => Result::query()
+            ->selectRaw('status, count(*) as total')
+            ->groupBy('status')->pluck('total', 'status')->all());
+        $totalResults = array_sum($counts);
+        $completedResults = $counts[ResultStatus::Completed->value] ?? 0;
+        $failedResults = $counts[ResultStatus::Failed->value] ?? 0;
 
         return [
             'total' => Number::format($totalResults),

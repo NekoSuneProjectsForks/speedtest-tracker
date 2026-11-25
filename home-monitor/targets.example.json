@@ -1,0 +1,23 @@
+[
+  {
+    "name": "internet_a",
+    "type": "http",
+    "url": "https://example.com/"
+  },
+  {
+    "name": "internet_b",
+    "type": "http",
+    "url": "https://www.iana.org/"
+  },
+  {
+    "name": "dns_a",
+    "type": "dns",
+    "hostname": "example.com"
+  },
+  {
+    "name": "router",
+    "type": "tcp",
+    "host": "192.168.1.1",
+    "port": 443
+  }
+]
