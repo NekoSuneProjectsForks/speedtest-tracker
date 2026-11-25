@@ -33,10 +33,10 @@ class GetLatestController extends Controller
                 'ping' => $latest->ping,
                 'download' => ! blank($latest->download) ? Number::bitsToMagnitude(bits: $latest->download_bits, precision: 2, magnitude: 'mbit') : null,
                 'upload' => ! blank($latest->upload) ? Number::bitsToMagnitude(bits: $latest->upload_bits, precision: 2, magnitude: 'mbit') : null,
-                'server_id' => $latest->server_id,
-                'server_host' => $latest->server_host,
-                'server_name' => $latest->server_name,
-                'url' => $latest->result_url,
+
+
+
+
                 'scheduled' => $latest->scheduled,
                 'failed' => $latest->status === ResultStatus::Failed,
                 'created_at' => $latest->created_at->timezone(config('app.display_timezone'))->toISOString(true),

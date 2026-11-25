@@ -26,3 +26,10 @@ Route::get('/speedtest/latest', GetLatestController::class)
 Route::middleware(['auth:sanctum', 'throttle:api', 'accept-json'])->group(function () {
     require __DIR__.'/api/v1/routes.php';
 });
+
+Route::prefix('v2')->middleware(['auth:sanctum', 'throttle:api'])->group(function () {
+    Route::get('/latest', [\App\Http\Controllers\Api\V2\PublicMetricsController::class, 'latest']);
+    Route::get('/history', [\App\Http\Controllers\Api\V2\PublicMetricsController::class, 'history']);
+    Route::get('/stats', [\App\Http\Controllers\Api\V2\PublicMetricsController::class, 'stats']);
+});
+Route::get('/v2/health', fn () => response()->json(['status' => 'ok']))->middleware('throttle:api');

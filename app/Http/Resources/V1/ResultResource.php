@@ -30,13 +30,13 @@ class ResultResource extends JsonResource
             'upload_bytes' => $this->upload_bytes,
             'download_bytes_human' => $this->when($this->download_bytes, fn (): string => Number::fileSize($this->download_bytes)),
             'upload_bytes_human' => $this->when($this->upload_bytes, fn (): string => Number::fileSize($this->upload_bytes)),
-            'benchmarks' => $this->benchmarks,
+
             'healthy' => $this->healthy,
             'status' => $this->status,
             'scheduled' => $this->scheduled,
-            'dispatched_by' => $this->dispatched_by,
-            'comments' => $this->comments,
-            'data' => $this->data,
+
+
+
             'created_at' => $this->created_at->toDateTimestring(),
             'updated_at' => $this->updated_at->toDateTimestring(),
         ];
