@@ -21,7 +21,7 @@ Route::get('/', HomeController::class)
     ->name('home');
 
 Route::get('/prometheus', MetricsController::class)
-    ->middleware(PrometheusAllowedIpMiddleware::class)
+    ->middleware([PrometheusAllowedIpMiddleware::class, 'throttle:api'])
     ->name('prometheus');
 
 Route::view('/getting-started', 'getting-started')

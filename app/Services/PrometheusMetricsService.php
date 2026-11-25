@@ -54,6 +54,8 @@ class PrometheusMetricsService
         );
         $infoGauge->set($result->id, $labelValues);
 
+        $this->registerGaugeIfNotNull($registry, 'result_timestamp_seconds', 'Time of the last test in Unix seconds', $labelNames, $labelValues, $result->created_at?->timestamp);
+
         // Only export numeric metrics for completed tests
         // Failed/incomplete tests won't have valid measurements
         if ($result->status !== ResultStatus::Completed) {
@@ -139,15 +141,15 @@ class PrometheusMetricsService
     protected function buildLabels(Result $result): array
     {
         return [
-            'server_id' => (string) ($result->server_id ?? ''),
-            'server_name' => $result->server_name ?? '',
-            'server_country' => $result->server_country ?? '',
-            'server_location' => $result->server_location ?? '',
-            'isp' => $result->isp ?? '',
+
+
+
+
+
             'scheduled' => $result->scheduled ? 'true' : 'false',
             'healthy' => $result->healthy ? 'true' : 'false',
             'status' => $result->status->value,
-            'app_name' => config('app.name', 'Speedtest Tracker'),
+
         ];
     }
 
