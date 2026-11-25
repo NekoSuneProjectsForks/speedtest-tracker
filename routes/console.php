@@ -39,3 +39,8 @@ Schedule::call(fn () => VacuumDatabase::run())
     ->at('03:15')
     ->name('sqlite-vacuum')
     ->onOneServer();
+
+Schedule::call(fn () => app(\App\Services\NetworkMonitor\Monitor::class)->prune())
+    ->daily()
+    ->name('network-monitor-retention')
+    ->withoutOverlapping();

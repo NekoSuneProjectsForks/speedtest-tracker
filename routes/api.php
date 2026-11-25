@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\NetworkMonitorController;
 use App\Http\Controllers\Api\V0\GetLatestController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,3 +34,17 @@ Route::prefix('v2')->middleware(['throttle:api'])->group(function () {
     Route::get('/stats', [\App\Http\Controllers\Api\V2\PublicMetricsController::class, 'stats']);
 });
 Route::get('/v2/health', fn () => response()->json(['status' => 'ok']))->middleware('throttle:api');
+
+Route::prefix('network-monitor/v1')->withoutMiddleware('throttle:api')->middleware(['throttle:network-monitor', 'accept-json'])->group(function () {
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/devices', [NetworkMonitorController::class, 'devices']);
+        Route::get('/rankings', [NetworkMonitorController::class, 'rankings']);
+        Route::get('/sources', [NetworkMonitorController::class, 'sources']);
+        Route::post('/sources', [NetworkMonitorController::class, 'register']);
+        Route::delete('/sources/{id}', [NetworkMonitorController::class, 'revoke'])->whereNumber('id');
+    });
+
+    Route::get('/collector/settings', [NetworkMonitorController::class, 'collectorSettings']);
+    Route::post('/collector/reports', [NetworkMonitorController::class, 'collect']);
+    Route::post('/agent/samples', [NetworkMonitorController::class, 'sample']);
+});

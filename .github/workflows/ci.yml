@@ -82,3 +82,6 @@ jobs:
         run: php artisan test
         env:
           DB_CONNECTION: sqlite
+
+      - name: Test Network Monitor collector
+        run: python3 -m unittest discover -s network-monitor

@@ -21,17 +21,18 @@ class ApiTokenForm
                         ->required(),
                     CheckboxList::make('abilities')
                         ->label(__('api_tokens.abilities'))
-                        ->options([
+                        ->options(fn () => [
                             'results:read' => __('api_tokens.read_results'),
                             'speedtests:run' => __('general.run_speedtest'),
                             'ookla:list-servers' => __('general.list_servers'),
-                        ])
+                        ] + (auth()->user()?->is_admin ? ['network-monitor:admin' => 'Administer Home Network Monitor'] : []))
                         ->required()
                         ->bulkToggleable()
                         ->descriptions([
                             'results:read' => __('api_tokens.read_results_description'),
                             'speedtests:run' => __('api_tokens.run_speedtest_description'),
                             'ookla:list-servers' => __('api_tokens.list_servers_description'),
+                            'network-monitor:admin' => 'Read private network data and manage monitoring credentials.',
                         ]),
                     DateTimePicker::make('expires_at')
                         ->label(__('api_tokens.expires_at'))

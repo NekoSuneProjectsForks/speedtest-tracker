@@ -1,0 +1,25 @@
+services:
+  lan-collector:
+    profiles: [network-monitor]
+    build:
+      context: .
+      dockerfile: Dockerfile.collector
+    network_mode: host
+    read_only: true
+    user: "${NETWORK_MONITOR_UID:-65532}:${NETWORK_MONITOR_GID:-65532}"
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 32
+    restart: unless-stopped
+    environment:
+      NETWORK_MONITOR_URL: "${NETWORK_MONITOR_URL:-http://127.0.0.1:8080}"
+      NETWORK_MONITOR_INTERFACE: "${NETWORK_MONITOR_INTERFACE:-eth0}"
+      NETWORK_MONITOR_SUBNET: "${NETWORK_MONITOR_SUBNET:-}"
+      NETWORK_MONITOR_TOKEN_FILE: /run/monitor/token
+    volumes:
+      - type: bind
+        source: ./secrets/collector-token
+        target: /run/monitor/token
+        read_only: true
+        bind:
+          create_host_path: false
