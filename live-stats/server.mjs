@@ -3,9 +3,8 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { sanitize } from './metrics.mjs';
 
 const base = process.env.TRACKER_URL;
-const token = process.env.TRACKER_TOKEN;
 const origin = process.env.PUBLIC_ORIGIN;
-if (!base || !token || !origin) throw new Error('TRACKER_URL, TRACKER_TOKEN and PUBLIC_ORIGIN are required');
+if (!base || !origin) throw new Error('TRACKER_URL and PUBLIC_ORIGIN are required');
 const upstream = new URL('/api/v2/latest', base);
 if (!['http:', 'https:'].includes(upstream.protocol)) throw new Error('Invalid tracker URL');
 const interval = Math.max(5000, Number(process.env.POLL_MS) || 5000);
@@ -41,7 +40,7 @@ async function poll() {
   if (busy) return;
   busy = true;
   try {
-    const response = await fetch(upstream,{headers:{Authorization:'Bearer '+token,Accept:'application/json'},signal:AbortSignal.timeout(4000),redirect:'error'});
+    const response = await fetch(upstream,{headers:{Accept:'application/json'},signal:AbortSignal.timeout(4000),redirect:'error'});
     if (!response.ok) throw new Error('Upstream unavailable');
     const payload = await response.json();
     const next = sanitize(payload.data);

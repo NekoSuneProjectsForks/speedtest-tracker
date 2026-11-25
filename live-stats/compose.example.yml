@@ -4,7 +4,6 @@ services:
     restart: unless-stopped
     environment:
       TRACKER_URL: ${TRACKER_URL:?set tracker URL}
-      TRACKER_TOKEN: ${TRACKER_TOKEN:?set read-only token}
       PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?set exact website origin}
       POLL_MS: "5000"
     ports:

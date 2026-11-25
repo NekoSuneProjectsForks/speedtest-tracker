@@ -16,11 +16,6 @@ class PublicMetricsController extends Controller
         return Result::query()->where('status', ResultStatus::Completed);
     }
 
-    private function authorizeRead(Request $request): void
-    {
-        abort_if($request->user()->tokenCant('results:read'), 403);
-    }
-
     private function number(mixed $value, float $scale = 1): ?float
     {
         return is_numeric($value) && is_finite((float) $value) ? round((float) $value * $scale, 3) : null;
@@ -41,7 +36,6 @@ class PublicMetricsController extends Controller
 
     public function latest(Request $request): JsonResponse
     {
-        $this->authorizeRead($request);
         $result = $this->query()->select(['id', 'created_at', 'download', 'upload', 'ping', 'data'])
             ->orderByDesc('id')->first();
 
@@ -50,7 +44,6 @@ class PublicMetricsController extends Controller
 
     public function history(Request $request): JsonResponse
     {
-        $this->authorizeRead($request);
         $input = $request->validate([
             'limit' => 'sometimes|integer|min:1|max:200',
             'before_id' => 'sometimes|integer|min:1',
@@ -72,7 +65,6 @@ class PublicMetricsController extends Controller
 
     public function stats(Request $request): JsonResponse
     {
-        $this->authorizeRead($request);
         $input = $request->validate(['days' => 'sometimes|integer|min:1|max:365']);
         $days = (int) ($input['days'] ?? 7);
         $stats = Cache::remember("metrics.v2.stats.$days", 30, function () use ($days) {
