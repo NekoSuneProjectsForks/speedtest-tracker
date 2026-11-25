@@ -3,6 +3,7 @@
 namespace App\Services\NetworkMonitor;
 
 use App\Jobs\SendNetworkMonitorAlert;
+use App\Settings\NotificationSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -155,7 +156,7 @@ class Reports
     private function alert(stdClass $settings, string $event): void
     {
         if ($settings->discord_alerts) {
-            SendNetworkMonitorAlert::dispatch($event)->afterCommit();
+            SendNetworkMonitorAlert::dispatchFor($event, app(NotificationSettings::class));
         }
     }
 }

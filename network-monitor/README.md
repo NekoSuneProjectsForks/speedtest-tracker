@@ -63,7 +63,7 @@ The default sampling interval is 60 seconds and can be set to 10–300 seconds i
 
 ## Discord notifications
 
-Enable Discord in the existing notification settings, enter a supported Discord webhook URL, and then enable Network Monitor Discord alerts. A queued notification is sent for a new device discovery or a newly detected outage. The notification text omits names, addresses, identifiers and traffic statistics.
+Enable Discord in the existing notification settings, enter a supported Discord webhook URL, and then enable Network Monitor Discord alerts. A queued notification is sent for a new device discovery or a newly detected outage. With an asynchronous queue such as the default database queue, transient delivery failures are retried per webhook for roughly a day, so an outage can be reported after connectivity returns. The notification text omits names, addresses, identifiers and traffic statistics.
 
 ## API and tests
 

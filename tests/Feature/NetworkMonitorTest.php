@@ -144,6 +144,10 @@ test('collector records confirmed and unconfirmed presence without losing last s
 test('outages need consecutive reports and close on recovery without UPnP traffic measurements', function () {
     Bus::fake([SendNetworkMonitorAlert::class]);
     DB::table('network_monitor_settings')->update(['enabled' => true, 'discord_alerts' => true]);
+    $notifications = app(NotificationSettings::class);
+    $notifications->discord_enabled = true;
+    $notifications->discord_webhooks = ['https://discord.com/api/webhooks/123/test-token'];
+    app()->instance(NotificationSettings::class, $notifications);
     $this->withToken(networkMonitorToken('collector'));
     $path = '/api/network-monitor/v1/collector/reports';
     $report = networkMonitorRound(['internet' => 'down', 'wan_bytes' => 4294967295]);
@@ -215,7 +219,13 @@ test('retention prunes history and Discord alerts have no device information', f
     $settings = app(NotificationSettings::class);
     $settings->discord_enabled = true;
     $settings->discord_webhooks = ['https://discord.com/api/webhooks/123/test-token', 'https://example.test/api/webhooks/123/test-token'];
-    (new SendNetworkMonitorAlert('devices'))->handle($settings);
+    $destination = hash('sha256', $settings->discord_webhooks[0]);
+    (new SendNetworkMonitorAlert('devices', $destination))->handle($settings);
     Http::assertSentCount(1);
     Http::assertSent(fn ($request) => $request['content'] === 'Home Network Monitor discovered a new device.');
+
+    Http::fake(['discord.com/*' => Http::failedConnection()]);
+    $outage = (new SendNetworkMonitorAlert('outage', $destination))->withFakeQueueInteractions();
+    $outage->handle($settings);
+    $outage->assertReleased(60);
 });
